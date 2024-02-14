@@ -1,7 +1,8 @@
-﻿using BepInEx;
+using BepInEx;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Utilla;
 
 
@@ -14,7 +15,7 @@ namespace Spedometer
     {
         bool inRoom;
         private GameObject speedTextObject;
-        private TextMesh speedTextMesh;
+        private TextMeshPro speedTextMesh;
         void Start()
         {
             Utilla.Events.GameInitialized += OnGameInitialized;
@@ -43,16 +44,15 @@ namespace Spedometer
             speedTextObject = new GameObject("SpeedText");
 
          
-            speedTextMesh = speedTextObject.AddComponent<TextMesh>();
+            speedTextMesh = speedTextObject.AddComponent<TextMeshPro>();
 
          
             speedTextMesh.text = "";
-            speedTextMesh.characterSize = 0.1f;
+            speedTextObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             speedTextMesh.fontSize = 10;
-            speedTextMesh.anchor = TextAnchor.MiddleCenter;
-            speedTextMesh.alignment = TextAlignment.Center;
+            speedTextMesh.alignment = TextAlignmentOptions.Center;
             speedTextMesh.color = Color.white;
-            InvokeRepeating("Updatee", 0, 0.1f);
+            InvokeRepeating("SpeedometerUpdate", 0, 0.1f);
         }
         void Update()
         {
@@ -61,14 +61,11 @@ namespace Spedometer
                 if (GorillaLocomotion.Player.Instance != null)
                 {
                     speedTextObject.transform.position = GorillaTagger.Instance.leftHandTransform.position + new Vector3(0.1f, 0f, 0f);
-
-
-                    Quaternion lookRotation = Quaternion.LookRotation(GorillaTagger.Instance.leftHandTransform.right, Vector3.up);
-                    speedTextObject.transform.rotation = lookRotation;
+                    speedTextObject.transform.eulerAngles = new Vector3(GorillaTagger.Instance.leftHandTransform.rotation.x + 360, GorillaTagger.Instance.leftHandTransform.rotation.y, GorillaTagger.Instance.leftHandTransform.rotation.z);
                 }
             }
         }
-        void Updatee()
+        void SpeedometerUpdate()
         {
             if (inRoom)
             {
@@ -90,14 +87,8 @@ namespace Spedometer
         [ModdedGamemodeJoin]
         public void OnJoin(string gamemode)
         {
-
-
             inRoom = true;
         }
-
-
-
-
 
         /* This attribute tells Utilla to call this method when a modded room is left */
         [ModdedGamemodeLeave]
